@@ -10,5 +10,5 @@ A sophisticated hub-and-spoke architecture platform that provides independent sp
 
 ## 🏗️ Architecture Overview
 
-[... rest of the README content I provided earlier ...]
+
 
