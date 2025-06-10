@@ -8,7 +8,13 @@
     "dev": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["fireapi", "central-hub", "intelligence", "sports-data"],
+  "keywords": [
+    "fireapi",
+    "central-hub",
+    "intelligence",
+    "sports-data",
+    "hub-spoke-architecture"
+  ],
   "author": "Fire-Ventures-Enterprise",
   "license": "ISC",
   "dependencies": {
@@ -31,5 +37,21 @@
     "bcryptjs": "^2.4.0",
     "dotenv": "^16.0.0",
     "compression": "^1.7.0"
-  }
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fire-Ventures-Enterprise/FireAPI-Hub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Fire-Ventures-Enterprise/FireAPI-Hub/issues"
+  },
+  "homepage": "https://github.com/Fire-Ventures-Enterprise/FireAPI-Hub#readme"
+}
 
