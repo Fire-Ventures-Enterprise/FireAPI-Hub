@@ -1,0 +1,174 @@
+{
+  "version": "1",
+  "name": "FireAPI-Hub",
+  "description": "Central API Hub for Fire Ventures Enterprise Ecosystem",
+  "services": {
+    "auth-gateway": {
+      "name": "FireAPI Auth Gateway",
+      "source": {
+        "type": "repo",
+        "repo": "Fire-Ventures-Enterprise/FireAPI-Hub",
+        "branch": "main"
+      },
+      "build": {
+        "dockerfile": "../docker/auth-gateway.Dockerfile",
+        "buildArgs": {
+          "SERVICE_NAME": "auth-gateway"
+        }
+      },
+      "deploy": {
+        "startCommand": "cd services/auth-gateway && npm start",
+        "healthcheckPath": "/health",
+        "restartPolicyType": "always"
+      },
+      "variables": {
+        "NODE_ENV": "production",
+        "PORT": "3001",
+        "SERVICE_NAME": "auth-gateway"
+      }
+    },
+    "service-registry": {
+      "name": "FireAPI Service Registry",
+      "source": {
+        "type": "repo",
+        "repo": "Fire-Ventures-Enterprise/FireAPI-Hub",
+        "branch": "main"
+      },
+      "build": {
+        "dockerfile": "../docker/service-registry.Dockerfile",
+        "buildArgs": {
+          "SERVICE_NAME": "service-registry"
+        }
+      },
+      "deploy": {
+        "startCommand": "cd services/service-registry && python -m uvicorn main:app --host 0.0.0.0 --port $PORT",
+        "healthcheckPath": "/health",
+        "restartPolicyType": "always"
+      },
+      "variables": {
+        "PYTHON_ENV": "production",
+        "PORT": "3002",
+        "SERVICE_NAME": "service-registry"
+      }
+    },
+    "data-router": {
+      "name": "FireAPI Data Router",
+      "source": {
+        "type": "repo",
+        "repo": "Fire-Ventures-Enterprise/FireAPI-Hub",
+        "branch": "main"
+      },
+      "build": {
+        "dockerfile": "../docker/data-router.Dockerfile",
+        "buildArgs": {
+          "SERVICE_NAME": "data-router"
+        }
+      },
+      "deploy": {
+        "startCommand": "cd services/data-router && npm start",
+        "healthcheckPath": "/health",
+        "restartPolicyType": "always"
+      },
+      "variables": {
+        "NODE_ENV": "production",
+        "PORT": "3003",
+        "SERVICE_NAME": "data-router"
+      }
+    },
+    "monitoring": {
+      "name": "FireAPI Monitoring",
+      "source": {
+        "type": "repo",
+        "repo": "Fire-Ventures-Enterprise/FireAPI-Hub",
+        "branch": "main"
+      },
+      "build": {
+        "dockerfile": "../docker/monitoring.Dockerfile",
+        "buildArgs": {
+          "SERVICE_NAME": "monitoring"
+        }
+      },
+      "deploy": {
+        "startCommand": "cd services/monitoring && python -m uvicorn main:app --host 0.0.0.0 --port $PORT",
+        "healthcheckPath": "/health",
+        "restartPolicyType": "always"
+      },
+      "variables": {
+        "PYTHON_ENV": "production",
+        "PORT": "3004",
+        "SERVICE_NAME": "monitoring"
+      }
+    }
+  },
+  "databases": {
+    "postgresql": {
+      "name": "FireAPI PostgreSQL",
+      "engine": "postgresql",
+      "version": "13"
+    },
+    "redis": {
+      "name": "FireAPI Redis",
+      "engine": "redis",
+      "version": "6"
+    }
+  },
+  "networking": {
+    "internal": {
+      "allowedServices": [
+        "auth-gateway",
+        "service-registry", 
+        "data-router",
+        "monitoring"
+      ]
+    },
+    "external": {
+      "domains": [
+        "fireapi.fire-ventures.com"
+      ]
+    }
+  },
+  "scaling": {
+    "auth-gateway": {
+      "minReplicas": 1,
+      "maxReplicas": 3,
+      "cpuTarget": 70,
+      "memoryTarget": 80
+    },
+    "service-registry": {
+      "minReplicas": 1,
+      "maxReplicas": 2,
+      "cpuTarget": 60,
+      "memoryTarget": 70
+    },
+    "data-router": {
+      "minReplicas": 1,
+      "maxReplicas": 4,
+      "cpuTarget": 75,
+      "memoryTarget": 85
+    },
+    "monitoring": {
+      "minReplicas": 1,
+      "maxReplicas": 2,
+      "cpuTarget": 60,
+      "memoryTarget": 70
+    }
+  },
+  "monitoring": {
+    "healthChecks": {
+      "enabled": true,
+      "interval": "30s",
+      "timeout": "10s",
+      "retries": 3
+    },
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "retention": "7d"
+    },
+    "metrics": {
+      "enabled": true,
+      "endpoint": "/metrics",
+      "interval": "15s"
+    }
+  }
+}
