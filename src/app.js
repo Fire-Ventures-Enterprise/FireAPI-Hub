@@ -29,9 +29,9 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     status: "operational",
   });
-});  // <-- This is line 32 (end of main hub endpoint)
+});
 
-// API v1 Routes  <-- Add the new code here
+// API v1 Routes
 app.get("/api/v1/health", (req, res) => {
   res.json({
     status: "healthy",
@@ -120,3 +120,11 @@ app.get("/api/v1/metrics", (req, res) => {
   });
 });
 
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`FireAPI Central Hub running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+});
+
+module.exports = app;
