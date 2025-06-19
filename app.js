@@ -2,114 +2,137 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-const compression = require('compression');
-const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-// Import middleware
-const authMiddleware = require('./middleware/auth.middleware');
-const errorHandler = require('./middleware/error-handler.middleware');
-
-// Import NBA routes
-const nbaWeatherRoutes = require('./services/sports/NBA/weather/weather.routes');
-const nbaH2HRoutes = require('./services/sports/NBA/h2h/h2h.routes');
-const nbaRefereeRoutes = require('./services/sports/NBA/referee/referee.routes');
-const nbaPlayerStatsRoutes = require('./services/sports/NBA/player-stats/player-stats.routes');
-const nbaTeamStatsRoutes = require('./services/sports/NBA/team-stats/team-stats.routes');
-const nbaInjuriesRoutes = require('./services/sports/NBA/injuries/injuries.routes');
-const nbaOddsRoutes = require('./services/sports/NBA/odds/odds.routes');
-const nbaSchedulesRoutes = require('./services/sports/NBA/schedules/schedules.routes');
-const nbaLiveScoresRoutes = require('./services/sports/NBA/live-scores/live-scores.routes');
-const nbaPlayerPropsRoutes = require('./services/sports/NBA/player-props/player-props.routes');
-const nbaTeamNewsRoutes = require('./services/sports/NBA/team-news/team-news.routes');
-const nbaPredictionsRoutes = require('./services/sports/NBA/predictions/predictions.routes');
-const nbaMasterRoutes = require('./services/sports/NBA/master-prediction/master.routes');
-
-// Initialize Express app
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Security middleware
+// Middleware
 app.use(helmet());
-app.use(compression());
-app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
-    credentials: true
-}));
-
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
-
-// Body parsing middleware
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('🔥 FireAPI-Hub connected to MongoDB Atlas'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+// MongoDB Connection
+const connectDB = async () => {
+    try {
+        if (process.env.MONGODB_URI) {
+            await mongoose.connect(process.env.MONGODB_URI);
+            console.log('✅ MongoDB Connected Successfully');
+        } else {
+            console.log('⚠️ MongoDB URI not found, running without database');
+        }
+    } catch (error) {
+        console.error('❌ MongoDB Connection Error:', error.message);
+        // Don't exit process, continue without DB for now
+    }
+};
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
+// Connect to database
+connectDB();
+
+// Health check route
+app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'healthy',
-        service: 'FireAPI-Hub NBA Intelligence',
-        version: '2.0.0',
+        service: 'FireAPI-Hub',
         timestamp: new Date().toISOString(),
-        uptime: process.uptime()
+        version: '1.0.0',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     });
 });
 
-// NBA API Routes
-app.use('/api/sports/nba/weather', nbaWeatherRoutes);
-app.use('/api/sports/nba/h2h', nbaH2HRoutes);
-app.use('/api/sports/nba/referee', nbaRefereeRoutes);
-app.use('/api/sports/nba/player-stats', nbaPlayerStatsRoutes);
-app.use('/api/sports/nba/team-stats', nbaTeamStatsRoutes);
-app.use('/api/sports/nba/injuries', nbaInjuriesRoutes);
-app.use('/api/sports/nba/odds', nbaOddsRoutes);
-app.use('/api/sports/nba/schedules', nbaSchedulesRoutes);
-app.use('/api/sports/nba/live-scores', nbaLiveScoresRoutes);
-app.use('/api/sports/nba/player-props', nbaPlayerPropsRoutes);
-app.use('/api/sports/nba/team-news', nbaTeamNewsRoutes);
-app.use('/api/sports/nba/predictions', nbaPredictionsRoutes);
-app.use('/api/sports/nba/master-prediction', nbaMasterRoutes);
-
-// Root endpoint
+// Root route
 app.get('/', (req, res) => {
+    res.status(200).json({
+        message: '🔥 Welcome to FireAPI-Hub - Complete NBA Data API',
+        status: 'running',
+        version: '1.0.0',
+        endpoints: {
+            health: '/health',
+            api_docs: '/api/docs',
+            test: '/api/test'
+        },
+        apis: [
+            '🌤️ Weather API',
+            '🏀 Teams API', 
+            '👨‍💼 Players API',
+            '🎮 Games API',
+            '🏆 Standings API',
+            '📊 Advanced Stats API',
+            '📰 News API',
+            '🏥 Injuries API',
+            '⚖️ Suspensions API'
+        ],
+        tiers: {
+            free: '100 requests/hour',
+            standard: '500 requests/hour', 
+            premium: '2000 requests/hour'
+        }
+    });
+});
+
+// Test route
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        message: '✅ FireAPI-Hub is working!', 
+        timestamp: new Date().toISOString(),
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+});
+
+// API Routes (will be added later)
+app.get('/api', (req, res) => {
     res.json({
-        message: '🔥 Welcome to FireAPI-Hub NBA Intelligence Engine',
-        version: '2.0.0',
-        services: ['NBA Weather', 'NBA H2H', 'NBA Referee', 'NBA Player Stats', 'NBA Team Stats', 'NBA Injuries', 'NBA Odds', 'NBA Schedules', 'NBA Live Scores', 'NBA Player Props', 'NBA Team News', 'NBA Predictions', 'NBA Master Prediction'],
-        documentation: '/api/docs',
-        health: '/api/health'
+        message: 'FireAPI-Hub NBA Data APIs',
+        available_apis: [
+            '/api/nba/weather',
+            '/api/nba/teams',
+            '/api/nba/players', 
+            '/api/nba/games',
+            '/api/nba/standings',
+            '/api/nba/advanced-stats',
+            '/api/nba/news',
+            '/api/nba/injuries',
+            '/api/nba/suspensions'
+        ],
+        status: 'Coming soon - APIs under development'
     });
 });
 
 // Error handling middleware
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+    console.error('Error:', err.stack);
+    res.status(500).json({ 
+        error: 'Something went wrong!',
+        message: err.message,
+        timestamp: new Date().toISOString()
+    });
+});
 
 // 404 handler
 app.use('*', (req, res) => {
-    res.status(404).json({
-        error: 'Endpoint not found',
-        message: 'The requested NBA API endpoint does not exist'
+    res.status(404).json({ 
+        error: 'Route not found',
+        path: req.originalUrl,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('👋 SIGTERM received, shutting down gracefully');
+    mongoose.connection.close(() => {
+        console.log('📦 MongoDB connection closed');
+        process.exit(0);
     });
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 FireAPI-Hub NBA Intelligence running on port ${PORT}`);
-    console.log(`🏀 NBA API Services: 12 endpoints active`);
-    console.log(`🎯 Master Prediction Engine: Ready`);
+    console.log(`🚀 FireAPI-Hub server running on port ${PORT}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+    console.log(`📊 API docs: http://localhost:${PORT}/api`);
 });
 
 module.exports = app;
