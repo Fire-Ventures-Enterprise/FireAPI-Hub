@@ -31,6 +31,32 @@ const connectDB = async () => {
 // Connect to database
 connectDB();
 
+// Connect to database
+connectDB();
+
+// ============= NBA API ROUTES =============
+const teamsRoutes = require('./services/sports/NBA/teams/teams.routes');
+const playersRoutes = require('./services/sports/NBA/players/players.routes');
+const gamesRoutes = require('./services/sports/NBA/games/games.routes');
+const standingsRoutes = require('./services/sports/NBA/standings/standings.routes');
+const advancedStatsRoutes = require('./services/sports/NBA/advanced-stats/advanced-stats.routes');
+const newsRoutes = require('./services/sports/NBA/news/news.routes');
+const injuriesRoutes = require('./services/sports/NBA/injuries/injuries.routes');
+const suspensionsRoutes = require('./services/sports/NBA/suspensions/suspensions.routes');
+const weatherRoutes = require('./services/sports/NBA/weather/weather.routes');
+
+app.use('/api/nba/teams', teamsRoutes);
+app.use('/api/nba/players', playersRoutes);
+app.use('/api/nba/games', gamesRoutes);
+app.use('/api/nba/standings', standingsRoutes);
+app.use('/api/nba/advanced-stats', advancedStatsRoutes);
+app.use('/api/nba/news', newsRoutes);
+app.use('/api/nba/injuries', injuriesRoutes);
+app.use('/api/nba/suspensions', suspensionsRoutes);
+app.use('/api/nba/weather', weatherRoutes);
+
+// Health check route (your existing code continues here...)
+
 // Health check route
 app.get('/health', (req, res) => {
     res.status(200).json({
