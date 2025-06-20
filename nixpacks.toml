@@ -1,14 +1,11 @@
 [variables]
-NPM_CONFIG_INCLUDE_WORKSPACE_ROOT = "false"
+NODE_ENV = "production"
 
 [phases.setup]
-nixPkgs = ['nodejs-18_x', 'npm-9_x']
+nixPkgs = ['nodejs-18_x']
 
 [phases.install]
-cmds = ['npm ci --omit=dev']
-
-[phases.build]
-cmds = ['echo "Build phase complete"']
+cmds = ['npm install --production']
 
 [start]
 cmd = 'npm start'
