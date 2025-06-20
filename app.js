@@ -82,12 +82,17 @@ app.get('/api/test', (req, res) => {
 });
 
 // API Routes (will be added later)
+// ============= NBA API ROUTES =============
+const teamsRoutes = require('./services/sports/NBA/teams/teams.routes');
+app.use('/api/nba/teams', teamsRoutes);
+
 app.get('/api', (req, res) => {
     res.json({
         message: 'FireAPI-Hub NBA Data APIs',
         available_apis: [
             '/api/nba/weather',
-            '/api/nba/teams',
+            '/api/nba/teams - NBA Teams API ✅ ACTIVE',
+
             '/api/nba/players', 
             '/api/nba/games',
             '/api/nba/standings',
@@ -96,7 +101,7 @@ app.get('/api', (req, res) => {
             '/api/nba/injuries',
             '/api/nba/suspensions'
         ],
-        status: 'Coming soon - APIs under development'
+        status: 'Teams API is now ACTIVE! 🏀'
     });
 });
 
