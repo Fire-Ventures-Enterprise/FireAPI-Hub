@@ -31,16 +31,12 @@ const connectDB = async () => {
 // Connect to database
 connectDB();
 
-// Connect to database
-connectDB();
-
-// ============= NBA API ROUTES (SIMPLIFIED) =================
-// Only add Teams API first - others will be added gradually
-// const teamsRoutes = require('./services/sports/NBA/teams/teams.routes'); ← KEEP COMMENTED
-
+// ============= NBA API ROUTES =============
+// Import and use Teams API (properly ordered)
+const teamsRoutes = require('./services/sports/NBA/teams/teams.routes');
 app.use('/api/nba/teams', teamsRoutes);
 
-// Other NBA APIs (temporarily disabled until we verify they work)
+// Other NBA APIs (commented out for now - add one by one after Teams works)
 // const playersRoutes = require('./services/sports/NBA/players/players.routes');
 // const gamesRoutes = require('./services/sports/NBA/games/games.routes');
 // const standingsRoutes = require('./services/sports/NBA/standings/standings.routes');
@@ -58,9 +54,6 @@ app.use('/api/nba/teams', teamsRoutes);
 // app.use('/api/nba/injuries', injuriesRoutes);
 // app.use('/api/nba/suspensions', suspensionsRoutes);
 // app.use('/api/nba/weather', weatherRoutes);
-
-
-// Health check route (your existing code continues here...)
 
 // Health check route
 app.get('/health', (req, res) => {
@@ -85,19 +78,19 @@ app.get('/', (req, res) => {
             test: '/api/test'
         },
         apis: [
-            '🌤️ Weather API',
-            '🏀 Teams API', 
-            '👨‍💼 Players API',
-            '🎮 Games API',
-            '🏆 Standings API',
-            '📊 Advanced Stats API',
-            '📰 News API',
-            '🏥 Injuries API',
-            '⚖️ Suspensions API'
+            '🏀 Teams API - ✅ ACTIVE',
+            '👨‍💼 Players API - Coming Soon',
+            '🎮 Games API - Coming Soon',
+            '🏆 Standings API - Coming Soon',
+            '📊 Advanced Stats API - Coming Soon',
+            '📰 News API - Coming Soon',
+            '🏥 Injuries API - Coming Soon',
+            '⚖️ Suspensions API - Coming Soon',
+            '🌤️ Weather API - Coming Soon'
         ],
         tiers: {
             free: '100 requests/hour',
-            standard: '500 requests/hour', 
+            standard: '500 requests/hour',
             premium: '2000 requests/hour'
         }
     });
@@ -112,27 +105,23 @@ app.get('/api/test', (req, res) => {
     });
 });
 
-// API Routes (will be added later)
-// ============= NBA API ROUTES =============
-const teamsRoutes = require('./services/sports/NBA/teams/teams.routes');
-app.use('/api/nba/teams', teamsRoutes);
-
+// API Routes info
 app.get('/api', (req, res) => {
     res.json({
         message: 'FireAPI-Hub NBA Data APIs',
         available_apis: [
-            '/api/nba/weather',
             '/api/nba/teams - NBA Teams API ✅ ACTIVE',
-
-            '/api/nba/players', 
-            '/api/nba/games',
-            '/api/nba/standings',
-            '/api/nba/advanced-stats',
-            '/api/nba/news',
-            '/api/nba/injuries',
-            '/api/nba/suspensions'
+            '/api/nba/players - Coming Soon',
+            '/api/nba/games - Coming Soon',
+            '/api/nba/standings - Coming Soon',
+            '/api/nba/advanced-stats - Coming Soon',
+            '/api/nba/news - Coming Soon',
+            '/api/nba/injuries - Coming Soon',
+            '/api/nba/suspensions - Coming Soon',
+            '/api/nba/weather - Coming Soon'
         ],
-        status: 'Teams API is now ACTIVE! 🏀'
+        status: 'Teams API is now ACTIVE! 🏀',
+        note: 'More APIs coming online soon!'
     });
 });
 
@@ -151,7 +140,15 @@ app.use('*', (req, res) => {
     res.status(404).json({ 
         error: 'Route not found',
         path: req.originalUrl,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        availableRoutes: [
+            '/',
+            '/health',
+            '/api',
+            '/api/test',
+            '/api/nba/teams',
+            '/api/nba/teams/health'
+        ]
     });
 });
 
@@ -168,6 +165,7 @@ process.on('SIGTERM', () => {
 app.listen(PORT, () => {
     console.log(`🚀 FireAPI-Hub server running on port ${PORT}`);
     console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+    console.log(`🏀 Teams API: http://localhost:${PORT}/api/nba/teams`);
     console.log(`📊 API docs: http://localhost:${PORT}/api`);
 });
 
