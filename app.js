@@ -36,7 +36,8 @@ connectDB();
 
 // ============= NBA API ROUTES (SIMPLIFIED) =================
 // Only add Teams API first - others will be added gradually
-const teamsRoutes = require('./services/sports/NBA/teams/teams.routes');
+// const teamsRoutes = require('./services/sports/NBA/teams/teams.routes'); ← KEEP COMMENTED
+
 app.use('/api/nba/teams', teamsRoutes);
 
 // Other NBA APIs (temporarily disabled until we verify they work)
